@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>LightningJS Tests</title>
+        <style type="text/css">
+            %(qunit_css_code)s
+        </style>
+        <script type="text/javascript">
+            %(qunit_javascript_code)s
+            ;(function(){
+                // helpers for testing
+                var testingLibraryCounter = 0;
+                window.loadNewTestingLibraryWithLightningjs = function(delayInSeconds, libraryNamespace, compressed) {
+                    // by default, we delay the download by 500ms to simulate minor server slowdowns
+                    delayInSeconds = delayInSeconds || 0.5;
+                    libraryNamespace = libraryNamespace || "testlib" + (testingLibraryCounter++) + (+new Date).toString();
+                    return lightningjs.require(libraryNamespace, [
+                        "/testlib?library_namespace=" + libraryNamespace,
+                        "delay=" + delayInSeconds,
+                        "compressed=" + (compressed ? 1 : 0),
+                    ].join("&"))
+                }
+                window.allValuesAreTruthy = function(values) {
+                    var truth = true;
+                    var didHaveAnyTruthyValues = false;
+                    for (var key in values) {
+                        if (values.hasOwnProperty(key)) {
+                            truth = truth && values[key];
+                            didHaveAnyTruthyValues = didHaveAnyTruthyValues || truth;
+                        }
+                    }
+                    return didHaveAnyTruthyValues && truth;
+                }
+            })();
+        </script>
+    </head>
+    <body>
+
+        <!-- begin embed code -->
+        <script type="text/javascript">/*{literal}<![CDATA[*/
+        %(lightningjs_embed_code)s
+        /*]]>{/literal}*/</script>
+        <!-- end embed code -->
+
+        <!-- begin qunit html -->
+        <h1 id="qunit-header">LightningJS Tests</h1>
+        <h2 id="qunit-banner"></h2>
+        <div id="qunit-testrunner-toolbar"></div>
+        <h2 id="qunit-userAgent"></h2>
+        <ol id="qunit-tests"></ol>
+        <div id="qunit-fixture"></div>
+        <!-- end qunit html -->
+
+        <!-- begin tests -->
+        <script type="text/javascript">
+            %(test_javascript_code)s
+        </script>
+        <!-- end tests -->
+
+    </body>
+</html>
