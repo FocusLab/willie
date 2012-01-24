@@ -9,6 +9,7 @@
   <link rel="stylesheet" type="text/css" href="lib/jasmine-1.1.0/jasmine.css">
   <script type="text/javascript" src="lib/jasmine-1.1.0/jasmine.js"></script>
   <script type="text/javascript" src="lib/jasmine-1.1.0/jasmine-html.js"></script>
+  <script type="text/javascript" src="lib/sinon-1.3.1.js"></script>
 
   <!-- include spec files here... -->
   <script type="text/javascript" src="spec/willie.js"></script>
@@ -21,8 +22,12 @@ return m};var a=c[j]._={};a.fh={};a.eh={};a.ph={};a.l=d?d.replace(/^\/\//,(g=="h
 g="createElement",i="src",k=h[g]("div"),l=k[d](h[g]("div")),f=h[g]("iframe"),n="document",p;k.style.display="none";e.insertBefore(k,e.firstChild).id=o+"-"+j;f.frameBorder="0";f.id=o+"-frame-"+j;/MSIE[ ]+6/.test(navigator.userAgent)&&(f[i]="javascript:false");f.allowTransparency="true";l[d](f);try{f.contentWindow[n].open()}catch(r){a.domain=h.domain,p="javascript:var d="+n+".open();d.domain='"+h.domain+"';",f[i]=p+"void(0);"}try{var q=f.contentWindow[n];q.write(b());q.close()}catch(s){f[i]=p+'d.write("'+
 b().replace(/"/g,String.fromCharCode(92)+'"')+'");d.close();'}a.P(2)}()})()}();c[b].lv="1";return c[b]}var o="lightningjs",k=window[o]=g(o);k.require=g;k.modules=c}({});
 
-  // window.FocusLab = lightningjs.require("FocusLab", "../build/focuslab.js");
-  window.FocusLab = lightningjs.require("FocusLab", "../build/focuslab.min.js");
+  window.FLOptions = {
+    remoteBase: 'http://local.flapidev.com:8000/cors/',
+    APIKey: '36ed4460165343fe948df573b44bd981'
+  }
+  window.FocusLab = lightningjs.require("FocusLab", "../build/focuslab.js");
+  // window.FocusLab = lightningjs.require("FocusLab", "../build/focuslab.min.js");
   /*]]>{/literal}*/</script>
   <!-- end embed code -->
 

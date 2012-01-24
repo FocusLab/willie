@@ -2,21 +2,25 @@ var FocusLab = (function(fl) {
     // *****************************************
     //      Handle Default Settings
     // *****************************************
-    function setDefaults() {
-        var defaults = {
-            cookieName: 'fl_actor_id',
-            remoteBase: 'https://api.focuslab.io/cors/'
-        };
-        for (var key in defaults) {
-            if (fl[key] === undefined) {
-                fl[key] = defaults[key];
-            }
-        }
-    }
-    setDefaults();
+    var defaults = {
+        cookieName: 'fl_actor_id',
+        remoteBase: 'https://api.focuslab.io/cors/',
+        triggerURI: '../api/v1/trigger/'
+    };
+
     // *****************************************
     //      Private Methods
     // *****************************************
+    function setDefaults(obj, defaults) {
+
+        for (var key in defaults) {
+            if (obj[key] === undefined) {
+                obj[key] = defaults[key];
+            }
+        }
+    }
+    setDefaults(fl, defaults);
+
     function createCookie(name,value,days) {
         var expires = "";
 
@@ -41,6 +45,18 @@ var FocusLab = (function(fl) {
 
     function eraseCookie(name) {
         createCookie(name,"",-1);
+    }
+
+    function getXHR() {
+        var xhr = new easyXDM.Rpc({
+            remote: fl.remoteBase
+        }, {
+            remote: {
+                request: {}
+            }
+        });
+
+        return xhr;
     }
 
     // *****************************************
@@ -90,7 +106,36 @@ var FocusLab = (function(fl) {
     };
 
     fl.recordTrigger = function(options) {
+        console.log("Recording trigger");
+        console.log(options);
+        var triggerDefaults = {
+            captured_identities: {},
+            captured_attributes: {}
+        };
+        var trigger = options['trigger'] || {};
+        var variables = trigger['variables'] || {};
+        var xhr = getXHR();
+        console.log("About to make request");
 
+        setDefaults(trigger, triggerDefaults);
+
+        variables['user_agent'] = window.parent.navigator.userAgent;
+
+        trigger['actor_id'] = fl.getActorId();
+        trigger['variables'] = variables;
+
+        xhr.request({
+            url: fl.triggerURI,
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-FL-API-KEY': fl.APIKey
+            },
+            data: JSON.stringify(trigger)
+        }, function(response){
+            console.log(response);
+        });
+        console.log('Request sent');
     };
 
     // Always return the export object
