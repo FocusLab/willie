@@ -1,6 +1,19 @@
 var FocusLab = (function(fl) {
-
-    window.console.log(fl);
+    // *****************************************
+    //      Handle Default Settings
+    // *****************************************
+    function setDefaults() {
+        var defaults = {
+            cookieName: 'fl_actor_id',
+            remoteBase: 'https://api.focuslab.io/cors/'
+        };
+        for (var key in defaults) {
+            if (fl[key] === undefined) {
+                fl[key] = defaults[key];
+            }
+        }
+    }
+    setDefaults();
     // *****************************************
     //      Private Methods
     // *****************************************
@@ -29,12 +42,6 @@ var FocusLab = (function(fl) {
     function eraseCookie(name) {
         createCookie(name,"",-1);
     }
-
-
-    // *****************************************
-    //      Public Attributes
-    // *****************************************
-    fl.cookieName = 'fl_actor_id';
 
     // *****************************************
     //      Public Methods
