@@ -1,7 +1,6 @@
-var FocusLab = (function() {
-    // Export Object
-    var fl = {};
+var FocusLab = (function(fl) {
 
+    window.console.log(fl);
     // *****************************************
     //      Private Methods
     // *****************************************
@@ -83,9 +82,13 @@ var FocusLab = (function() {
         eraseCookie(fl.cookieName);
     };
 
+    fl.recordTrigger = function(options) {
+
+    };
+
     // Always return the export object
     return fl;
-}());
+}(window.parent.FLOptions || {}));
 
 
 // *****************************************
@@ -94,9 +97,12 @@ var FocusLab = (function() {
 lightningjs.provide("FocusLab", {
     getActorId: function(options) {
         return FocusLab.getActorId(options);
-   },
-   resetTracking: function(options) {
+    },
+    resetTracking: function(options) {
         return FocusLab.resetTracking();
-   }
+    },
+    recordTrigger: function(options) {
+        return FocusLab.recordTrigger(options);
+    }
 });
 
