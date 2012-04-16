@@ -125,7 +125,11 @@ describe("Willie", function() {
     });
 
     it('Records a trigger', function() {
+        var spec = this;
         FocusLab("recordTrigger", {
+            success: function() {
+                alert('success');
+            },
             'trigger': {
                 'action': 'view',
                 'object': 'homepage'

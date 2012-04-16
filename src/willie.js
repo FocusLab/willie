@@ -5,7 +5,7 @@ var FocusLab = (function(fl) {
     var defaults = {
         cookieName: 'fl_actor_id',
         remoteBase: 'https://api.focuslab.io/cors/',
-        triggerURI: '../api/v1/trigger/'
+        triggerURI: 'https://api.focuslab.io/api/v1/trigger/'
     };
 
     // *****************************************
@@ -106,8 +106,6 @@ var FocusLab = (function(fl) {
     };
 
     fl.recordTrigger = function(options) {
-        console.log("Recording trigger");
-        console.log(options);
         var triggerDefaults = {
             captured_identities: {},
             captured_attributes: {}
@@ -115,7 +113,6 @@ var FocusLab = (function(fl) {
         var trigger = options['trigger'] || {};
         var variables = trigger['variables'] || {};
         var xhr = getXHR();
-        console.log("About to make request");
 
         setDefaults(trigger, triggerDefaults);
 
@@ -132,10 +129,7 @@ var FocusLab = (function(fl) {
                 'X-FL-API-KEY': fl.APIKey
             },
             data: JSON.stringify(trigger)
-        }, function(response){
-            console.log(response);
         });
-        console.log('Request sent');
     };
 
     // Always return the export object
