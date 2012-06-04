@@ -5,7 +5,8 @@ var FocusLab = (function(fl) {
     var defaults = {
         cookieName: 'fl_actor_id',
         remoteBase: 'https://api.focuslab.io/cors/',
-        triggerURI: 'https://api.focuslab.io/api/v1/trigger/'
+        triggerURI: 'https://api.focuslab.io/api/v1/trigger/',
+        release_version:  'v1.0'
     };
 
     // *****************************************
@@ -132,6 +133,10 @@ var FocusLab = (function(fl) {
         });
     };
 
+    fl.getRelease = function(options) {
+        return fl.release_version;
+    };
+
     // Always return the export object
     return fl;
 }(window.parent.FLOptions || {}));
@@ -149,6 +154,9 @@ lightningjs.provide("FocusLab", {
     },
     recordTrigger: function(options) {
         return FocusLab.recordTrigger(options);
+    },
+    getRelease: function(options) {
+        return FocusLab.getRelease();
     }
 });
 
