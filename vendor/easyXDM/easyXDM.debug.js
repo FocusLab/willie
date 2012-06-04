@@ -505,10 +505,6 @@ function createFrame(config){
     frame.id = frame.name = config.props.name;
     delete config.props.name;
     
-    if (config.onLoad) {
-        on(frame, "load", config.onLoad);
-    }
-    
     if (typeof config.container == "string") {
         config.container = document.getElementById(config.container);
     }
@@ -539,9 +535,36 @@ function createFrame(config){
     frame.allowTransparency = true;
     config.container.appendChild(frame);
     
+    if (config.onLoad) {
+        on(frame, "load", config.onLoad);
+    }
+    
     // set the frame URL to the proper value (we previously set it to
     // "javascript:false" to work around the IE issue mentioned above)
-    frame.src = src;
+    if(config.usePost) {
+        var form = config.container.appendChild(document.createElement('form')), input;
+        form.target = frame.name;
+        form.action = src;
+        form.method = 'POST';
+        if (typeof(config.usePost) === 'object') {
+            for (var i in config.usePost) {
+                if (config.usePost.hasOwnProperty(i)) {
+                    if (HAS_NAME_PROPERTY_BUG) {
+                        input = document.createElement('<input name="' + i + '"/>');
+                    } else {
+                        input = document.createElement("INPUT");
+                        input.name = i;
+                    }
+                    input.value = config.usePost[i];
+                    form.appendChild(input);
+                }
+            }
+        }
+        form.submit();
+        form.parentNode.removeChild(form);
+    } else {
+        frame.src = src;
+    }
     config.props.src = src;
     
     return frame;
@@ -634,7 +657,6 @@ function prepareTransportStack(config){
                  * navigating from one domain to another, and where parent.frames[foo] can be used
                  * to get access to a frame from the same domain
                  */
-                config.remoteHelper = resolveUrl(config.remoteHelper);
                 protocol = "2";
             }
             else {
@@ -724,6 +746,7 @@ function prepareTransportStack(config){
             stackEls = [new easyXDM.stack.PostMessageTransport(config)];
             break;
         case "2":
+            config.remoteHelper = resolveUrl(config.remoteHelper);
             stackEls = [new easyXDM.stack.NameTransport(config), new easyXDM.stack.QueueBehavior(), new easyXDM.stack.VerifyBehavior({
                 initiate: config.isHost
             })];
@@ -805,7 +828,7 @@ function removeFromStack(element){
 /** 
  * @class easyXDM
  * A javascript library providing cross-browser, cross-domain messaging/RPC.
- * @version 2.4.15.0
+ * @version 2.4.15.1
  * @singleton
  */
 apply(easyXDM, {
@@ -813,7 +836,7 @@ apply(easyXDM, {
      * The version of the library
      * @type {string}
      */
-    version: "2.4.15.0",
+    version: "2.4.15.1",
     /**
      * This is a map containing all the query parameters passed to the document.
      * All the values has been decoded using decodeURIComponent.
@@ -2369,6 +2392,7 @@ easyXDM.stack.ReliableBehavior = function(config){
                 currentMessage = "";
                 if (callback) {
                     callback(true);
+                    callback = null;
                 }
             }
             if (message.length > 0) {

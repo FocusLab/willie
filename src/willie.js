@@ -1,16 +1,27 @@
-window.lightningjs||function(f,h){var d=f.lightningjs={modules:h.modules},n=h.modules;d.expensive=function(b){b._waitforload=!0;return b};d.require=h.require;d.provide=function(b,k){function l(){var a=f.console;if(a&&a.error)try{a.error.apply(a,arguments)}catch(c){}else if(f.opera)try{f.opera.postError.apply(f.opera,arguments)}catch(i){}}function h(a){var c=a[0],i=a[1],b=i>0?o[i]:k,g=Array.prototype.slice.call(a[2]),f=g.shift();a=e._.fh[c]=e._.fh[c]||[];i=e._.eh[c]=e._.eh[c]||[];e._.ph[c]=e._.ph[c]||
-[];var d,j;if(b){if(b=b[f])try{d=b.apply(b,g)}catch(m){j=m}else j=Error("unknown deferred method '"+f+"'"),l(j.toString());d&&(o[c]=d);if(j){for(;i.length;){c=i.shift();try{c(j)}catch(n){l(n)}}i.push=function(a){a(j)}}else{for(;a.length;){c=a.shift();try{c(d)}catch(p){l(p)}}a.push=function(a){a(d)}}}else l("cannot call deferred method '"+f+"' on 'undefined'")}function p(){for(var a=g.shift();a;){var c;if(q)c=!1;else{var b=a[1];c=b>0?o[b]:k;var d=Array.prototype.slice.call(a[2]).shift(),e=void 0;b=
-r[b]?!0:!1;c=c?(e=c[d])?e._waitforload?!0:!1:!1:b?!0:!1}c?(r[a[0]]=!0,m.push(a)):h(a);a=g.shift()}}d.require(b);var e=n[b];if(e.provided)l("deferred module '"+b+"' is already defined");else{e.provided=!0;var g=(e._.s||[]).slice(),o={0:k},m=[],r={},q=!1;g&&g[0]&&(o[g[0][1]]=k);k._load=function(){q=!0;for(var a=m.shift();a;)h(a),a=m.shift()};e._.s={push:function(a){g.push(a);p()}};p()}};n.lightningjs.provided||d.provide("lightningjs",{load:function(){var b=h.modules,d,f;for(f in b)d=b[f],d._&&d("_load")}})}(window,
-window.parent.lightningjs);
-
-
-var FocusLab = (function() {
-    // Export Object
-    var fl = {};
+var FocusLab = (function(fl) {
+    // *****************************************
+    //      Handle Default Settings
+    // *****************************************
+    var defaults = {
+        cookieName: 'fl_actor_id',
+        remoteBase: 'https://api.focuslab.io/cors/',
+        triggerURI: 'https://api.focuslab.io/api/v1/trigger/',
+        release_version:  'v1.0'
+    };
 
     // *****************************************
     //      Private Methods
     // *****************************************
+    function setDefaults(obj, defaults) {
+
+        for (var key in defaults) {
+            if (obj[key] === undefined) {
+                obj[key] = defaults[key];
+            }
+        }
+    }
+    setDefaults(fl, defaults);
+
     function createCookie(name,value,days) {
         var expires = "";
 
@@ -37,11 +48,17 @@ var FocusLab = (function() {
         createCookie(name,"",-1);
     }
 
+    function getXHR() {
+        var xhr = new easyXDM.Rpc({
+            remote: fl.remoteBase
+        }, {
+            remote: {
+                request: {}
+            }
+        });
 
-    // *****************************************
-    //      Public Attributes
-    // *****************************************
-    fl.cookieName = 'fl_actor_id';
+        return xhr;
+    }
 
     // *****************************************
     //      Public Methods
@@ -87,11 +104,42 @@ var FocusLab = (function() {
 
     fl.resetTracking = function() {
         eraseCookie(fl.cookieName);
-    }
+    };
+
+    fl.recordTrigger = function(options) {
+        var triggerDefaults = {
+            captured_identities: {},
+            captured_attributes: {}
+        };
+        var trigger = options['trigger'] || {};
+        var variables = trigger['variables'] || {};
+        var xhr = getXHR();
+
+        setDefaults(trigger, triggerDefaults);
+
+        variables['user_agent'] = window.parent.navigator.userAgent;
+
+        trigger['actor_id'] = fl.getActorId();
+        trigger['variables'] = variables;
+
+        xhr.request({
+            url: fl.triggerURI,
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-FL-API-KEY': fl.APIKey
+            },
+            data: JSON.stringify(trigger)
+        });
+    };
+
+    fl.getRelease = function(options) {
+        return fl.release_version;
+    };
 
     // Always return the export object
     return fl;
-}());
+}(window.parent.FLOptions || {}));
 
 
 // *****************************************
@@ -100,9 +148,15 @@ var FocusLab = (function() {
 lightningjs.provide("FocusLab", {
     getActorId: function(options) {
         return FocusLab.getActorId(options);
-   },
-   resetTracking: function(options) {
+    },
+    resetTracking: function(options) {
         return FocusLab.resetTracking();
-   }
+    },
+    recordTrigger: function(options) {
+        return FocusLab.recordTrigger(options);
+    },
+    getRelease: function(options) {
+        return FocusLab.getRelease();
+    }
 });
 

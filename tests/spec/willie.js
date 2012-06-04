@@ -123,4 +123,22 @@ describe("Willie", function() {
             expect(readCookie('fl_actor_id')).toBeNull();
         });
     });
+
+    it('Records a trigger', function() {
+        var spec = this;
+        FocusLab("recordTrigger", {
+            success: function() {
+                alert('success');
+            },
+            'trigger': {
+                'action': 'view',
+                'object': 'homepage'
+            }
+        }).then(function() {
+            console.log('sucesss');
+        }, function(error) {
+            console.log('error');
+            console.log(error);
+        });
+    });
 });
